@@ -87,35 +87,17 @@ def xavier_init(size):
 
 
 def generate_real_samples_with_labels_Rayleigh(h_dataset, number=100):
-    """
-    Generate real (labeled) samples for training the CGAN.
-
-    Steps:
-        1. Randomly select channel coefficients from h_dataset.
-        2. Generate random 16-QAM symbols.
-        3. Create received signal y = h*x + n.
-        4. Construct the conditioning vector.
-
-    Args:
-        h_dataset: Dataset of complex channel coefficients.
-        number: Number of samples to generate.
-
-    Returns:
-        received_data: shape [number, 2], columns are [Re(y), Im(y)]
-        conditioning: shape [number, 4], columns are [Re(x), Im(x), Re(h), Im(h)] / 3
-    """
-    # 1) Randomly sample channel coefficients h from dataset
+    # randomly select channel coefficients h
     h_complex = np.random.choice(h_dataset, number)
     h_r = np.real(h_complex)
     h_i = np.imag(h_complex)
 
-    # 2) Randomly generate transmitted 16-QAM symbols x
+    # randomly generate QAM symbols x
     labels_index = np.random.choice(len(mean_set_QAM), number)
     data = mean_set_QAM[labels_index]
 
-    # 3) Simulate received signal y = h*x + n
+    # received signal y = h*x + n
     received_complex = h_complex * data
-
     received_data = np.hstack(
         (
             np.real(received_complex).reshape(number, 1),
@@ -124,12 +106,12 @@ def generate_real_samples_with_labels_Rayleigh(h_dataset, number=100):
     )
 
     gaussian_random = np.random.multivariate_normal(
-        mean=[0, 0], cov=[[0.01, 0], [0, 0.01]], size=number
+        [0, 0], [[0.01, 0], [0, 0.01]], number
     ).astype(np.float32)
 
     received_data = received_data + gaussian_random
 
-    # 4) Construct conditioning vector [Re(x), Im(x), Re(h), Im(h)]
+    # conditioning vector = [Re(x), Im(x), Re(h), Im(h)] / 3
     conditioning = (
         np.hstack(
             (
