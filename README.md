@@ -238,7 +238,7 @@ Exercise_2.4_starter.py
 rayleigh_channel_dataset.mat
 ```
 
-由Exercise_2.4(a) 產出
+資料來源由Exercise_2.4(a) 產出
 
 ---
 
